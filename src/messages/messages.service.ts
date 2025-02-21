@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Message } from './entities/message.entity';
 
 @Injectable()
@@ -21,12 +21,12 @@ export class MessagesService {
   }
 
   // find an specific message by its id or null if it not exists
-  findOne(id: number): Message | null {
+  findOne(id: number): Message | never {
     const message = this.messages.find((message) => id === message.id);
 
     if (message) return message;
 
-    return null;
+    throw new NotFoundException();
   }
 
   create(message: Message): Message {
@@ -43,8 +43,11 @@ export class MessagesService {
     return newMessage;
   }
 
-  update(id: number, body: Message) {
+  update(id: number, body: Message): Message | never {
     const message = this.messages.find((message) => message.id === id);
+
+    if (!message) throw new NotFoundException();
+
     const index = this.messages.findIndex((message) => message.id === id);
 
     const updatedMessage = {
@@ -57,11 +60,15 @@ export class MessagesService {
     return updatedMessage;
   }
 
-  remove(id: number) {
+  remove(id: number): void | never {
+    const message = this.messages.find((message) => message.id === id);
+
+    if (!message) throw new NotFoundException();
+
     const messagesAfterRemoved = this.messages.filter(
       (message) => message.id !== id,
     );
 
-    return (this.messages = messagesAfterRemoved);
+    this.messages = messagesAfterRemoved;
   }
 }

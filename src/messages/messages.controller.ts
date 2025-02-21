@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -27,12 +29,8 @@ export class MessagesController {
 
   // find an specific message by its id
   @Get(':id')
-  findOne(@Param('id') id: string): Message | { status: string } {
-    const message = this.messagesService.findOne(+id);
-
-    if (message) return message;
-
-    return { status: 'not found' };
+  findOne(@Param('id') id: string): Message {
+    return this.messagesService.findOne(+id);
   }
 
   @Post()
@@ -45,9 +43,9 @@ export class MessagesController {
     return this.messagesService.update(+id, body);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    this.messagesService.remove(+id);
-    return 'removido';
+    return this.messagesService.remove(+id);
   }
 }
