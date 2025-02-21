@@ -12,6 +12,8 @@ import {
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { Message } from './entities/message.entity';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Controller('messages')
 export class MessagesController {
@@ -34,13 +36,13 @@ export class MessagesController {
   }
 
   @Post()
-  create(@Body() body: Message) {
-    return this.messagesService.create(body);
+  create(@Body() createMessageDto: CreateMessageDto) {
+    return this.messagesService.create(createMessageDto);
   }
 
   @Patch(':id')
-  update(@Body() body: Message, @Param('id') id: string) {
-    return this.messagesService.update(+id, body);
+  update(@Body() updateMessageDto: UpdateMessageDto, @Param('id') id: string) {
+    return this.messagesService.update(+id, updateMessageDto);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
