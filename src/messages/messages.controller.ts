@@ -9,6 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
+import { Message } from './entities/message.entity';
 
 @Controller('messages')
 export class MessagesController {
@@ -16,7 +17,7 @@ export class MessagesController {
 
   // find all messages
   @Get()
-  findAll(@Query() pagination: { limit: number; offset: number }): string {
+  findAll(@Query() pagination: { limit: number; offset: number }): Message[] {
     const { limit = 10, offset = 10 } = pagination;
 
     console.log(limit, offset);
@@ -26,28 +27,27 @@ export class MessagesController {
 
   // find an specific message by its id
   @Get(':id')
-  findOne(@Param('id') id: string): string {
-    return this.messagesService.findOne(id);
+  findOne(@Param('id') id: string): Message | { status: string } {
+    const message = this.messagesService.findOne(+id);
+
+    if (message) return message;
+
+    return { status: 'not found' };
   }
 
   @Post()
-  create(@Body() body: { author: number; message: string }) {
-    return body;
+  create(@Body() body: Message) {
+    return this.messagesService.create(body);
   }
 
   @Patch(':id')
-  update(
-    @Body() body: { author: number; message: string },
-    @Param('id') id: string,
-  ) {
-    return {
-      id,
-      ...body,
-    };
+  update(@Body() body: Message, @Param('id') id: string) {
+    return this.messagesService.update(+id, body);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return `Recado ${id} deletado com sucesso`;
+    this.messagesService.remove(+id);
+    return 'removido';
   }
 }
